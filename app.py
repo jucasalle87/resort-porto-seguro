@@ -338,6 +338,10 @@ if not st.session_state.get("authentication_status"):
         [data-testid="stMain"] div[data-testid="stFormSubmitButton"] button {
             margin: 0 auto;
         }
+        /* Menos espaço em branco no topo da página. */
+        [data-testid="stMain"] div[data-testid="stMainBlockContainer"] {
+            padding-top: 2rem !important;
+        }
         </style>
         """,
         unsafe_allow_html=True,
@@ -345,9 +349,9 @@ if not st.session_state.get("authentication_status"):
     col1, col2, col3 = st.columns([1, 1.3, 1])
     with col2:
         st.markdown(
-            f"<div style='text-align:center; margin-bottom:12px;'>"
+            f"<div style='text-align:center; margin-bottom:4px;'>"
             f"<img src='data:image/png;base64,{img_b64(asset('darkpool_logo.png'))}' "
-            f"style='width:220px; max-width:70%; height:auto;'></div>",
+            f"style='width:260px; max-width:80%; height:auto;'></div>",
             unsafe_allow_html=True,
         )
         st.markdown(
@@ -427,7 +431,7 @@ if not st.session_state.get("_access_logged"):
     st.session_state["_access_logged"] = True
 
 with st.sidebar:
-    st.image(asset("darkpool_logo.png"), width=150)
+    st.image(asset("darkpool_logo.png"), width=180)
     st.markdown(f"**Bem-vindo(a),**  \n{name}")
     st.caption(f"Usuário: {username}")
     authenticator.logout("Sair", "sidebar")
