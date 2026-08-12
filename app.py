@@ -314,13 +314,29 @@ if not st.session_state.get("authentication_status"):
             color: var(--forest) !important;
             font-weight: 600 !important;
         }
-        /* Campos e botão do formulário mais estreitos e centralizados,
-           em vez de ocupar toda a largura da coluna. */
+        /* Tudo centralizado: textos, rótulos, campos e botão — não só
+           largura reduzida, mas também alinhamento central de verdade,
+           via flexbox nos containers (mais confiável que só margin:auto). */
+        [data-testid="stMain"] * {
+            text-align: center;
+        }
+        [data-testid="stMain"] div[data-testid="stVerticalBlock"] {
+            align-items: center;
+        }
+        [data-testid="stMain"] div[data-testid="stForm"] {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+        }
         [data-testid="stMain"] div[data-testid="stTextInput"],
         [data-testid="stMain"] div[data-testid="stFormSubmitButton"] {
             max-width: 280px;
+            width: 100%;
             margin-left: auto;
             margin-right: auto;
+        }
+        [data-testid="stMain"] div[data-testid="stFormSubmitButton"] button {
+            margin: 0 auto;
         }
         </style>
         """,
