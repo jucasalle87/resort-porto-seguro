@@ -1,0 +1,13 @@
+cookie:
+  expiry_days: 7
+  key: 928a6f51083a88ba71d2c058fd01c02f81beb40263d0c25f
+  name: darkpool_resort_portoseguro_auth
+credentials:
+  usernames:
+    darkpool:
+      email: negocios@darkpool.com.br
+      failed_login_attempts: 0
+      logged_in: false
+      name: DarkPool Intermediação de Ativos
+      password: $2b$12$KSv7JuyhTXkNOhmTMXUu8ubsfWb3JNypJA.tibims8fSGzJ90z0ie
+      role: master

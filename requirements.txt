@@ -1,0 +1,5 @@
+streamlit==1.61.1
+streamlit-authenticator==0.4.2
+PyYAML==6.0.3
+pandas==2.3.3
+requests>=2.31.0
