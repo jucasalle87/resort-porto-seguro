@@ -93,9 +93,27 @@ def ler_arquivo(path: str, default: str = "") -> str:
         return conteudo if conteudo is not None else default
 
 
+def _sha_atual(url: str, headers: dict, branch: str):
+    try:
+        resp = requests.get(url, headers=headers, params={"ref": branch}, timeout=TIMEOUT)
+        if resp.status_code == 200:
+            return resp.json()["sha"]
+    except requests.RequestException:
+        pass
+    return None
+
+
 def salvar_arquivo(path: str, content: str, mensagem: str = None):
     """Salva o conteúdo (texto) de um arquivo, tanto localmente quanto no
-    GitHub (se configurado)."""
+    GitHub (se configurado).
+
+    Se duas gravações acontecerem quase ao mesmo tempo (ex: dois acessos
+    registrados em sequência rápida), a API do GitHub pode recusar a
+    primeira tentativa com status 409 (o "sha" ficou desatualizado entre a
+    leitura e a escrita) — nesse caso, busca o sha mais novo e tenta de
+    novo uma vez antes de desistir. O arquivo local já foi salvo de
+    qualquer forma, então não há perda de dado mesmo se as duas tentativas
+    falharem."""
     _salvar_local(path, content)
 
     token, repo, branch = _config()
@@ -104,27 +122,25 @@ def salvar_arquivo(path: str, content: str, mensagem: str = None):
 
     url = f"https://api.github.com/repos/{repo}/contents/{path}"
     headers = {"Authorization": f"token {token}", "Accept": "application/vnd.github+json"}
-
-    # Precisa do sha do arquivo atual pra poder sobrescrever (regra da API do GitHub)
-    sha = None
-    try:
-        resp = requests.get(url, headers=headers, params={"ref": branch}, timeout=TIMEOUT)
-        if resp.status_code == 200:
-            sha = resp.json()["sha"]
-    except requests.RequestException:
-        pass
-
-    payload = {
+    payload_base = {
         "message": mensagem or f"Atualiza {path}",
         "content": base64.b64encode(content.encode("utf-8")).decode("utf-8"),
         "branch": branch,
     }
-    if sha:
-        payload["sha"] = sha
 
-    try:
-        put_resp = requests.put(url, headers=headers, json=payload, timeout=TIMEOUT)
-        if put_resp.status_code not in (200, 201):
-            st.warning(f"Não foi possível salvar '{path}' no GitHub (status {put_resp.status_code}).")
-    except requests.RequestException as e:
-        st.warning(f"Não foi possível conectar ao GitHub ({e}). '{path}' salvo só localmente.")
+    for tentativa in (1, 2):
+        sha = _sha_atual(url, headers, branch)
+        payload = dict(payload_base)
+        if sha:
+            payload["sha"] = sha
+        try:
+            put_resp = requests.put(url, headers=headers, json=payload, timeout=TIMEOUT)
+        except requests.RequestException as e:
+            st.warning(f"Não foi possível conectar ao GitHub ({e}). '{path}' salvo só localmente.")
+            return
+        if put_resp.status_code in (200, 201):
+            return
+        if put_resp.status_code == 409 and tentativa == 1:
+            continue  # sha ficou desatualizado — busca de novo e tenta mais uma vez
+        st.warning(f"Não foi possível salvar '{path}' no GitHub (status {put_resp.status_code}).")
+        return

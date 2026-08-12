@@ -45,9 +45,12 @@ st.markdown(
         --forest: #1C2B1A; --forest-light: #4A7A47;
         --cream: #F5F0E8; --cream-dark: #EDE5D4;
         --ink: #1A1A18; --ink-mid: #3A3A36;
+        --black: #000000;
     }
     .stApp { background: var(--cream); }
-    section[data-testid="stSidebar"] { background: var(--forest); }
+    /* Sidebar na mesma cor de fundo do logo da DarkPool (preto), pra ficar
+       tudo integrado visualmente. */
+    section[data-testid="stSidebar"] { background: var(--black); }
     /* Só forçamos a cor clara em texto "solto" da sidebar (títulos, legendas,
        labels, markdown) — nunca em inputs/textareas ou em popovers/tooltips,
        que têm fundo claro próprio e ficariam ilegíveis (texto claro em
@@ -68,21 +71,39 @@ st.markdown(
         background: white !important;
         -webkit-text-fill-color: var(--ink) !important;
     }
-    /* Botões da sidebar (Sair, Salvar, o expander de navegação) têm fundo
-       claro por padrão — sem isso o texto ficava claro em fundo claro. */
-    section[data-testid="stSidebar"] button {
+    /* Botões "de verdade" da sidebar (Sair, Salvar) têm fundo claro por
+       padrão — sem isso o texto ficava claro em fundo claro. Escopado só
+       pros botões reais (stButton/stFormSubmitButton), NUNCA pro botãozinho
+       de mostrar/ocultar senha (esse fica dentro de stTextInput, ver abaixo
+       — ele deve continuar discreto, sem caixa dourada). */
+    section[data-testid="stSidebar"] div[data-testid="stButton"] button,
+    section[data-testid="stSidebar"] div[data-testid="stFormSubmitButton"] button {
         background: var(--gold) !important;
         border: 1px solid var(--gold) !important;
     }
-    section[data-testid="stSidebar"] button p,
-    section[data-testid="stSidebar"] button span,
-    section[data-testid="stSidebar"] button div {
+    section[data-testid="stSidebar"] div[data-testid="stButton"] button p,
+    section[data-testid="stSidebar"] div[data-testid="stButton"] button span,
+    section[data-testid="stSidebar"] div[data-testid="stButton"] button div,
+    section[data-testid="stSidebar"] div[data-testid="stFormSubmitButton"] button p,
+    section[data-testid="stSidebar"] div[data-testid="stFormSubmitButton"] button span,
+    section[data-testid="stSidebar"] div[data-testid="stFormSubmitButton"] button div {
         color: var(--forest) !important;
         font-weight: 600 !important;
     }
-    section[data-testid="stSidebar"] button:hover {
+    section[data-testid="stSidebar"] div[data-testid="stButton"] button:hover,
+    section[data-testid="stSidebar"] div[data-testid="stFormSubmitButton"] button:hover {
         background: var(--gold-light) !important;
         border-color: var(--gold-light) !important;
+    }
+    /* Botão de mostrar/ocultar senha (o "olhinho") — sem caixa colorida,
+       só o ícone preto em cima do fundo branco do campo, como no padrão
+       do Streamlit. */
+    section[data-testid="stSidebar"] div[data-testid="stTextInput"] button {
+        background: transparent !important;
+        border: none !important;
+    }
+    section[data-testid="stSidebar"] div[data-testid="stTextInput"] button svg {
+        fill: var(--ink) !important;
     }
     /* Cabeçalho do expander ("Navegação" etc.) tem o mesmo problema. */
     section[data-testid="stSidebar"] details summary {
@@ -247,6 +268,50 @@ authenticator = stauth.Authenticate(
 )
 
 if not st.session_state.get("authentication_status"):
+    # Tela de login com fundo preto, na mesma cor do logo — pra ficar tudo
+    # integrado (fundo + logo + sidebar, quando ela aparecer, depois do
+    # login, também é preta).
+    st.markdown(
+        """
+        <style>
+        .stApp { background: var(--black) !important; }
+        [data-testid="stMain"] h1,
+        [data-testid="stMain"] h2,
+        [data-testid="stMain"] h3,
+        [data-testid="stMain"] p,
+        [data-testid="stMain"] span,
+        [data-testid="stMain"] label,
+        [data-testid="stMain"] small {
+            color: var(--cream) !important;
+        }
+        [data-testid="stMain"] input {
+            color: var(--ink) !important;
+            background: white !important;
+            -webkit-text-fill-color: var(--ink) !important;
+        }
+        [data-testid="stMain"] div[data-testid="stTextInput"] button {
+            background: transparent !important;
+            border: none !important;
+        }
+        [data-testid="stMain"] div[data-testid="stTextInput"] button svg {
+            fill: var(--ink) !important;
+        }
+        [data-testid="stMain"] div[data-testid="stButton"] button,
+        [data-testid="stMain"] div[data-testid="stFormSubmitButton"] button {
+            background: var(--gold) !important;
+            border: 1px solid var(--gold) !important;
+        }
+        [data-testid="stMain"] div[data-testid="stButton"] button p,
+        [data-testid="stMain"] div[data-testid="stButton"] button span,
+        [data-testid="stMain"] div[data-testid="stFormSubmitButton"] button p,
+        [data-testid="stMain"] div[data-testid="stFormSubmitButton"] button span {
+            color: var(--forest) !important;
+            font-weight: 600 !important;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
     col1, col2, col3 = st.columns([1, 1.3, 1])
     with col2:
         st.image(asset("darkpool_logo.png"), width=140)
