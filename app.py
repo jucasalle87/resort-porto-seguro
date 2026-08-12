@@ -2,6 +2,7 @@ import os
 import io
 import csv
 import time
+import base64
 from datetime import datetime, timedelta, timezone
 
 import streamlit as st
@@ -218,6 +219,11 @@ def asset(name):
     return os.path.join(ASSETS, name)
 
 
+def img_b64(path):
+    with open(path, "rb") as f:
+        return base64.b64encode(f.read()).decode()
+
+
 def sync_config_from_github_to_local():
     """No arranque do app, garante que o config.yaml local (usado pelo
     streamlit_authenticator, que só sabe ler/escrever no disco) esteja
@@ -308,13 +314,26 @@ if not st.session_state.get("authentication_status"):
             color: var(--forest) !important;
             font-weight: 600 !important;
         }
+        /* Campos e botão do formulário mais estreitos e centralizados,
+           em vez de ocupar toda a largura da coluna. */
+        [data-testid="stMain"] div[data-testid="stTextInput"],
+        [data-testid="stMain"] div[data-testid="stFormSubmitButton"] {
+            max-width: 280px;
+            margin-left: auto;
+            margin-right: auto;
+        }
         </style>
         """,
         unsafe_allow_html=True,
     )
     col1, col2, col3 = st.columns([1, 1.3, 1])
     with col2:
-        st.image(asset("darkpool_logo.png"), width=140)
+        st.markdown(
+            f"<div style='text-align:center; margin-bottom:12px;'>"
+            f"<img src='data:image/png;base64,{img_b64(asset('darkpool_logo.png'))}' "
+            f"style='width:220px; max-width:70%; height:auto;'></div>",
+            unsafe_allow_html=True,
+        )
         st.markdown(
             "<div class='dp-badge'>Acesso Restrito · Estritamente Confidencial</div>",
             unsafe_allow_html=True,
@@ -337,6 +356,16 @@ if not st.session_state.get("authentication_status"):
         elif st.session_state.get("authentication_status") is None:
             st.info("Informe seu usuário e senha para acessar o dataroom.")
         st.caption("Acesso individual e monitorado. Em caso de dúvidas, contate a DarkPool Intermediação de Ativos.")
+        st.markdown(
+            "<div style='text-align:center; margin-top:6px;'>"
+            "<a href='https://www.darkpool.com.br' target='_blank' "
+            "style='color:var(--gold-light); text-decoration:none; font-size:0.85rem;'>"
+            "www.darkpool.com.br</a><br>"
+            "<a href='mailto:negocios@darkpool.com.br' "
+            "style='color:var(--gold-light); text-decoration:none; font-size:0.85rem;'>"
+            "negocios@darkpool.com.br</a></div>",
+            unsafe_allow_html=True,
+        )
     st.stop()
 
 # ─────────────────────────────────────────────────────────────
@@ -382,7 +411,7 @@ if not st.session_state.get("_access_logged"):
     st.session_state["_access_logged"] = True
 
 with st.sidebar:
-    st.image(asset("darkpool_logo.png"), width=110)
+    st.image(asset("darkpool_logo.png"), width=150)
     st.markdown(f"**Bem-vindo(a),**  \n{name}")
     st.caption(f"Usuário: {username}")
     authenticator.logout("Sair", "sidebar")
@@ -495,12 +524,6 @@ if role == "master" and page == "Administração":
 # ═════════════════════════════════════════════════════════════
 # DATAROOM — CONTEÚDO DO IMÓVEL
 # ═════════════════════════════════════════════════════════════
-import base64
-
-def img_b64(path):
-    with open(path, "rb") as f:
-        return base64.b64encode(f.read()).decode()
-
 st.markdown(
     f"""
     <div class="dp-cover">
