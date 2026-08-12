@@ -68,6 +68,32 @@ st.markdown(
         background: white !important;
         -webkit-text-fill-color: var(--ink) !important;
     }
+    /* Botões da sidebar (Sair, Salvar, o expander de navegação) têm fundo
+       claro por padrão — sem isso o texto ficava claro em fundo claro. */
+    section[data-testid="stSidebar"] button {
+        background: var(--gold) !important;
+        border: 1px solid var(--gold) !important;
+    }
+    section[data-testid="stSidebar"] button p,
+    section[data-testid="stSidebar"] button span,
+    section[data-testid="stSidebar"] button div {
+        color: var(--forest) !important;
+        font-weight: 600 !important;
+    }
+    section[data-testid="stSidebar"] button:hover {
+        background: var(--gold-light) !important;
+        border-color: var(--gold-light) !important;
+    }
+    /* Cabeçalho do expander ("Navegação" etc.) tem o mesmo problema. */
+    section[data-testid="stSidebar"] details summary {
+        background: var(--gold) !important;
+        border-radius: 4px;
+    }
+    section[data-testid="stSidebar"] details summary span,
+    section[data-testid="stSidebar"] details summary p {
+        color: var(--forest) !important;
+        font-weight: 600 !important;
+    }
     /* Qualquer tooltip/popover do Streamlit (ex: dica de senha) — sempre
        texto escuro em fundo claro, onde quer que seja renderizado. */
     div[data-baseweb="tooltip"], div[data-baseweb="popover"] {
@@ -302,23 +328,23 @@ with st.sidebar:
             "Navegação", ["Dataroom", "Administração"],
             label_visibility="collapsed", on_change=_marcar_atividade,
         )
-    with st.expander("Alterar minha senha"):
-        try:
-            if authenticator.reset_password(
-                username,
-                location="sidebar",
-                fields={
-                    "Form name": "Alterar Senha",
-                    "Current password": "Senha atual",
-                    "New password": "Nova senha",
-                    "Repeat password": "Confirmar nova senha",
-                    "Reset": "Salvar",
-                },
-            ):
-                push_local_config_to_github(f"Atualiza senha de '{username}'")
-                st.success("Senha alterada com sucesso.")
-        except Exception as e:
-            st.error(str(e))
+    try:
+        if authenticator.reset_password(
+            username,
+            location="sidebar",
+            clear_on_submit=True,
+            fields={
+                "Form name": "Alterar Senha",
+                "Current password": "Senha atual",
+                "New password": "Nova senha",
+                "Repeat password": "Confirmar nova senha",
+                "Reset": "Salvar",
+            },
+        ):
+            push_local_config_to_github(f"Atualiza senha de '{username}'")
+            st.success("Senha alterada com sucesso.")
+    except Exception as e:
+        st.error(str(e))
 
 # ═════════════════════════════════════════════════════════════
 # ADMIN PAGE
