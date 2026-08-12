@@ -1,12 +1,14 @@
 import os
 import io
 import csv
+import time
 from datetime import datetime, timedelta, timezone
 
 import streamlit as st
 import streamlit_authenticator as stauth
 import yaml
 import pandas as pd
+from streamlit_autorefresh import st_autorefresh
 
 import github_storage
 
@@ -46,7 +48,31 @@ st.markdown(
     }
     .stApp { background: var(--cream); }
     section[data-testid="stSidebar"] { background: var(--forest); }
-    section[data-testid="stSidebar"] * { color: var(--cream) !important; }
+    /* Só forçamos a cor clara em texto "solto" da sidebar (títulos, legendas,
+       labels, markdown) — nunca em inputs/textareas ou em popovers/tooltips,
+       que têm fundo claro próprio e ficariam ilegíveis (texto claro em
+       fundo claro). */
+    section[data-testid="stSidebar"] p,
+    section[data-testid="stSidebar"] span,
+    section[data-testid="stSidebar"] label,
+    section[data-testid="stSidebar"] h1,
+    section[data-testid="stSidebar"] h2,
+    section[data-testid="stSidebar"] h3,
+    section[data-testid="stSidebar"] div[data-testid="stMarkdownContainer"],
+    section[data-testid="stSidebar"] small {
+        color: var(--cream);
+    }
+    section[data-testid="stSidebar"] input,
+    section[data-testid="stSidebar"] textarea {
+        color: var(--ink) !important;
+        background: white !important;
+        -webkit-text-fill-color: var(--ink) !important;
+    }
+    /* Qualquer tooltip/popover do Streamlit (ex: dica de senha) — sempre
+       texto escuro em fundo claro, onde quer que seja renderizado. */
+    div[data-baseweb="tooltip"], div[data-baseweb="popover"] {
+        color: var(--ink) !important;
+    }
     h1, h2, h3 { color: var(--forest); font-family: Georgia, 'Times New Roman', serif; }
     .dp-badge {
         display:inline-block; border:1px solid var(--gold); color:var(--gold-dark);
@@ -173,12 +199,25 @@ def push_local_config_to_github(mensagem="Atualiza config.yaml"):
 sync_config_from_github_to_local()
 config = load_config()
 
+
+class SenhaLivreValidator(stauth.Validator):
+    """Desliga a exigência de senha forte da biblioteca (maiúscula, número,
+    caractere especial etc.) — aqui qualquer senha não vazia é aceita."""
+
+    def validate_password(self, password: str) -> bool:
+        return bool(password)
+
+
 authenticator = stauth.Authenticate(
     credentials=CONFIG_PATH,
     cookie_name=config["cookie"]["name"],
     cookie_key=config["cookie"]["key"],
     cookie_expiry_days=config["cookie"]["expiry_days"],
     auto_hash=False,
+    validator=SenhaLivreValidator(),
+    # Sem exigência de senha forte — qualquer senha é aceita, e some a
+    # dica de regras que aparecia embaixo do campo.
+    password_instructions="",
 )
 
 if not st.session_state.get("authentication_status"):
@@ -190,6 +229,9 @@ if not st.session_state.get("authentication_status"):
             unsafe_allow_html=True,
         )
         st.markdown("### Dataroom — Resort em Porto Seguro")
+        mensagem_pos_logout = st.session_state.pop("_mensagem_pos_logout", None)
+        if mensagem_pos_logout:
+            st.info(mensagem_pos_logout)
         authenticator.login(
             location="main",
             fields={
@@ -205,6 +247,35 @@ if not st.session_state.get("authentication_status"):
             st.info("Informe seu usuário e senha para acessar o dataroom.")
         st.caption("Acesso individual e monitorado. Em caso de dúvidas, contate a DarkPool Intermediação de Ativos.")
     st.stop()
+
+# ─────────────────────────────────────────────────────────────
+# LOGOUT AUTOMÁTICO POR INATIVIDADE (20 minutos)
+# ─────────────────────────────────────────────────────────────
+LIMITE_INATIVIDADE_MIN = 20
+
+if "last_activity" not in st.session_state:
+    st.session_state["last_activity"] = time.time()
+
+# Verifica a cada 60s mesmo sem nenhuma ação do usuário (sem isso, o script
+# só roda de novo quando alguém clica em algo, e o timeout nunca seria
+# percebido enquanto a pessoa só fica olhando a tela sem clicar em nada).
+st_autorefresh(interval=60_000, key="verifica_inatividade")
+
+minutos_inativo = (time.time() - st.session_state["last_activity"]) / 60
+if minutos_inativo > LIMITE_INATIVIDADE_MIN:
+    authenticator.logout(location="unrendered")
+    st.session_state.pop("_access_logged", None)
+    st.session_state.pop("last_activity", None)
+    st.session_state["_mensagem_pos_logout"] = (
+        f"Sessão encerrada automaticamente após {LIMITE_INATIVIDADE_MIN} "
+        "minutos de inatividade. Faça login novamente."
+    )
+    st.rerun()
+
+
+def _marcar_atividade():
+    st.session_state["last_activity"] = time.time()
+
 
 # ─────────────────────────────────────────────────────────────
 # LOGGED IN
@@ -227,7 +298,10 @@ with st.sidebar:
     st.divider()
     page = "Dataroom"
     if role == "master":
-        page = st.radio("Navegação", ["Dataroom", "Administração"], label_visibility="collapsed")
+        page = st.radio(
+            "Navegação", ["Dataroom", "Administração"],
+            label_visibility="collapsed", on_change=_marcar_atividade,
+        )
     with st.expander("Alterar minha senha"):
         try:
             if authenticator.reset_password(
@@ -397,6 +471,12 @@ for i, (fname, label) in enumerate(gallery):
 
 st.divider()
 
+st.markdown("<div class='dp-section-label'>Vídeo de Apresentação</div>", unsafe_allow_html=True)
+st.markdown("## Conheça o Resort em Vídeo")
+st.video("https://youtu.be/dAATgLmdj-4")
+
+st.divider()
+
 st.markdown("<div class='dp-section-label'>Infraestrutura de Lazer & Entretenimento</div>", unsafe_allow_html=True)
 st.markdown("## Complexo Completo de Lazer à Beira-Mar")
 amenities = [
@@ -469,7 +549,6 @@ st.markdown(
         <p>📧 <a href="mailto:negocios@darkpool.com.br">negocios@darkpool.com.br</a></p>
         <p>💬 <a href="https://wa.me/554333369677" target="_blank">+55 43 3336-9677</a></p>
         <p>🌐 <a href="https://darkpool.com.br/" target="_blank">DarkPool.com.br</a></p>
-        <p>▶️ <a href="https://youtu.be/dAATgLmdj-4" target="_blank">Vídeo de Apresentação</a></p>
     </div>
     """,
     unsafe_allow_html=True,

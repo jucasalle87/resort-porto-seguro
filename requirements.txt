@@ -3,3 +3,4 @@ streamlit-authenticator==0.4.2
 PyYAML==6.0.3
 pandas==2.3.3
 requests>=2.31.0
+streamlit-autorefresh>=1.0.1
