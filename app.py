@@ -159,6 +159,43 @@ st.markdown(
     div[data-testid="stMetric"] {
         background: white; border: 1px solid var(--cream-dark); padding: 12px 8px; border-radius: 4px;
     }
+    /* Blindagem contra o tema Light/Dark/System do próprio Streamlit
+       (menu ⋮ > Settings > Choose app theme, ou o padrão do sistema
+       operacional/navegador do visitante). Texto "solto" que não tem cor
+       customizada (parágrafos de st.write, legendas de st.caption, rótulos
+       e valores de st.metric) segue a cor de texto do tema ativo — se o
+       visitante estiver em "Dark" ou "Use system setting" com o SO em modo
+       escuro, essa cor vira clara. Como o fundo da página principal e a
+       caixa dos metrics continuam forçados em cream/branco (regras acima),
+       o texto claro ficava invisível. Forçamos aqui a cor escura sempre,
+       independente do tema escolhido pelo visitante.
+       (config.toml também define base = "light" pra evitar que o app
+       inicie automaticamente em modo escuro quando o visitante estiver
+       em "Use system setting" com SO escuro — mas isso não impede uma
+       troca manual pra "Dark" no menu, daí esta blindagem em CSS.) */
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] p,
+    [data-testid="stMain"] [data-testid="stMarkdownContainer"] li,
+    [data-testid="stMain"] label,
+    [data-testid="stMain"] [data-testid="stCaptionContainer"],
+    [data-testid="stMain"] [data-testid="stCaptionContainer"] * {
+        color: var(--ink) !important;
+    }
+    [data-testid="stMain"] div[data-testid="stMetric"] [data-testid="stMetricLabel"],
+    [data-testid="stMain"] div[data-testid="stMetric"] [data-testid="stMetricLabel"] * {
+        color: var(--ink-mid) !important;
+    }
+    [data-testid="stMain"] div[data-testid="stMetric"] [data-testid="stMetricValue"],
+    [data-testid="stMain"] div[data-testid="stMetric"] [data-testid="stMetricValue"] * {
+        color: var(--forest) !important;
+    }
+    /* Exceção: dentro da caixa de contato (fundo verde-escuro), o texto
+       precisa continuar claro — sem isso a regra genérica acima (mesma
+       especificidade, mas definida depois no CSS) deixaria o texto de
+       e-mail/whatsapp/site ilegível de novo, agora claro-sobre-claro
+       virando escuro-sobre-escuro. */
+    [data-testid="stMain"] .dp-contact-box p {
+        color: var(--cream) !important;
+    }
     </style>
     """,
     unsafe_allow_html=True,
