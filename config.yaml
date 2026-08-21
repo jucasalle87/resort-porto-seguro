@@ -25,3 +25,10 @@ credentials:
       name: Paulo Molina
       password: $2b$12$VoKqTvWkC7Rdj7gZYz8rf.hrIrudA6cyDLG8WyAo/4psuGIF6nAgS
       role: user
+    samuel.lana:
+      email: ''
+      failed_login_attempts: 0
+      logged_in: false
+      name: Samuel Lana
+      password: $2b$12$CWEMO.6MMcA4ksYcGc.W3eMDs7PCyQ/WV38vaAOKYWBjVxv.yb0bm
+      role: user
