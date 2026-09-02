@@ -299,7 +299,7 @@ class SenhaLivreValidator(stauth.Validator):
 
 
 authenticator = stauth.Authenticate(
-    credentials=CONFIG_PATH,
+    credentials=config["credentials"],
     cookie_name=config["cookie"]["name"],
     cookie_key=config["cookie"]["key"],
     cookie_expiry_days=config["cookie"]["expiry_days"],
