@@ -4,6 +4,13 @@ cookie:
   name: darkpool_resort_portoseguro_auth
 credentials:
   usernames:
+    Anna.aporema:
+      email: ''
+      failed_login_attempts: 0
+      logged_in: false
+      name: Anna Aporema
+      password: $2b$12$iuzstksTmS1VoHrNbJvgo.cm7X2.A6ZyBabn7NAS12YYFL.1Ytv4m
+      role: user
     brian.alves:
       email: ''
       failed_login_attempts: 0
