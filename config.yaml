@@ -4,6 +4,13 @@ cookie:
   name: darkpool_resort_portoseguro_auth
 credentials:
   usernames:
+    brian.alves:
+      email: ''
+      failed_login_attempts: 0
+      logged_in: false
+      name: Brian Nikholas Iwakura Alves
+      password: $2b$12$.vvaHNfrreEaSG1cQ0GEPObklvIdEOX3yFF.IZYz7IOsp8lzHN/R6
+      role: user
     darkpool:
       email: negocios@darkpool.com.br
       failed_login_attempts: 0
