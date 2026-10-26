@@ -32,6 +32,13 @@ credentials:
       name: Ismael Nogueira
       password: $2b$12$3pZhKbOjbHUTtJu2WV378OW33kKQrPe.s8ehwJJewjMRaq9gZ1Dcu
       role: user
+    jose.simao:
+      email: ''
+      failed_login_attempts: 0
+      logged_in: false
+      name: José Simão Jr
+      password: $2b$12$lttGg3h68DfzcGsbRGap0uVdZ.iBHiu/CEsBMNKDzk5WN8dgAH5nu
+      role: user
     osmar.aoki:
       email: aoki_100@hotmail.com
       failed_login_attempts: 0
