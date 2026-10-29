@@ -598,7 +598,7 @@ st.markdown(
 c1, c2, c3, c4 = st.columns(4)
 c1.metric("Valor de Aquisição", "R$ 150 mi")
 c2.metric("Apartamentos", "160 UHs")
-c3.metric("Terreno", "53.000 m²")
+c3.metric("Terreno", "63.000 m²")
 c4.metric("Frente-Mar", "3.000 m²")
 
 st.markdown("<div class='dp-section-label'>Sumário Executivo</div>", unsafe_allow_html=True)
@@ -609,8 +609,8 @@ st.write(
     "Aeroporto Internacional de Porto Seguro."
 )
 st.write(
-    "São 160 apartamentos standard (até 5 pessoas por unidade), distribuídos em um terreno de 53.000 m² "
-    "com 10.000 m² de área construída e frente de mar exclusiva de 3.000 m² pé na areia — considerada uma "
+    "São 160 apartamentos standard (até 5 pessoas por unidade), distribuídos em um terreno de 63.000 m² "
+    "com 13.226,77 m² de área construída e frente de mar exclusiva de 3.000 m² pé na areia — considerada uma "
     "das melhores praias de Porto Seguro."
 )
 
