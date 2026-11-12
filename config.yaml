@@ -18,6 +18,13 @@ credentials:
       name: Brian Nikholas Iwakura Alves
       password: $2b$12$.vvaHNfrreEaSG1cQ0GEPObklvIdEOX3yFF.IZYz7IOsp8lzHN/R6
       role: user
+    daniel.outliers:
+      email: ''
+      failed_login_attempts: 0
+      logged_in: false
+      name: Daniel Outliers
+      password: $2b$12$iZyPqo7azIhsuDFdiFzxeuh/O/4Wq5lDiA8IBzfyyskaU5VwZOGhy
+      role: user
     darkpool:
       email: negocios@darkpool.com.br
       failed_login_attempts: 0
