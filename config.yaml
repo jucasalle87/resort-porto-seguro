@@ -60,6 +60,13 @@ credentials:
       name: Samuel Lana
       password: $2b$12$CWEMO.6MMcA4ksYcGc.W3eMDs7PCyQ/WV38vaAOKYWBjVxv.yb0bm
       role: user
+    samuel.ponsoni:
+      email: ''
+      failed_login_attempts: 0
+      logged_in: false
+      name: Samuel Ponsoni
+      password: $2b$12$1.x7Haou/aEHYfxkpR0YRuyUI.og0Pa6Qjtez2K5dzabcmVranNBK
+      role: user
     thiago.nogueira:
       email: thiago.nogueira@aureainv.com
       failed_login_attempts: 0
